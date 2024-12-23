@@ -7,6 +7,7 @@ import re
 from pandas import DataFrame, read_csv
 from typing import Union
 import shutil
+import sqlite3
 
 BASE_URL = 'https://dadosabertos.tse.jus.br/api/3/'
 PACKAGE_LIST_PATH = 'action/package_list'
@@ -155,3 +156,8 @@ class TseClient():
                 print(f'Erro deletando arquivos {e}. Tipo de erro: {type(e)}')
         
         return f'Diretório {path} esvaziado' if not os.listdir(path) else f'Falha em remover arquivos de {path}'
+    
+
+class TseAnalysis:
+    def __init__(self):
+        pass
