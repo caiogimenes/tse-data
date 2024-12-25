@@ -202,5 +202,72 @@ def listar_tabelas(db_path: str):
 
 
 class TseAnalysis:
-    def __init__(self):
+    def __init__(self, database: dict):
+        """
+        Tse Analysis
+        
+        Keyword arguments:
+        database -- (dict) {
+            'path': database_path: str,
+            'alias' name: str
+        }
+        Return: TseAnalysis object
+        """
+        self.main_database = database.get('path')
+        self.alias = database.get('alias')
+        self.conn = None
+        self.cursor = self._setup_()
         pass
+    
+    def _setup_(self):
+        """
+        Setup databases
+        
+        Keyword arguments:
+        attach -- (dict) {
+            'path': path: str,
+            'alias': name: str
+        }
+        Return: cursor object
+        """
+        self.conn = sqlite3.connect(database=self.main_database)
+        self.cursor = self.conn.cursor()
+        self.cursor.execute(f"ATTACH DATABASE '{self.main_database}' AS {self.alias}")
+        
+        return self.cursor
+    
+    def attach_database(self, attach: list[dict]):
+        for database in attach:
+            alias = database.get('alias')
+            path = database.get('path')
+            self.cursor.execute(f"ATTACH DATABASE '{path}' AS {alias}")
+        
+        self.cursor.execute("PRAGMA database_list;")
+        databases = self.cursor.fetchall()
+        print('Bancos carregados:')
+        for index, alias, path in databases:
+            print(f'{index}) {alias}')
+            print(f'-path: {path}')
+            self.cursor.execute(f'SELECT name FROM {alias}.sqlite_master WHERE type="table";')
+            tables = self.cursor.fetchall()
+            print('--tables: ')
+            for tabel in tables:
+                print('--', tabel[0])
+            print('-----')
+    
+    def create_index(self, table: str, columns: list):
+        str_columns = ', '.join(columns)
+        try:
+            self.cursor.execute(
+                f"""
+                    CREATE INDEX IF NOT EXISTS
+                        idx_{table}
+                    ON
+                        {table}({str_columns});
+                """
+            )
+            self.conn.commit()
+            return 'Indices criados com sucesso'
+        
+        except Exception as e:
+            print(f'Ocorreu erro {e} criando indices. {type(e)}.')
