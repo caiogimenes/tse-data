@@ -4,7 +4,7 @@ import os
 import io
 import zipfile
 import re
-from pandas import DataFrame, read_csv
+from pandas import DataFrame, read_csv, read_sql
 from typing import Union
 import shutil
 import sqlite3
@@ -271,3 +271,38 @@ class TseAnalysis:
         
         except Exception as e:
             print(f'Ocorreu erro {e} criando indices. {type(e)}.')
+            
+    def _unique_values(self, alias, table, col) -> list:
+        query = f"""
+            SELECT DISTINCT 
+                {col}
+            FROM 
+                {alias}.{table}
+        """
+        return read_sql(query, self.conn)[col].to_list()
+    
+    def _count_cases(self, alias: str, table: str, col: str) -> str:
+        unique = self._unique_values(alias, table, col)
+        statements = []
+        for val in unique:
+            col_alias = (col.lower() + '_' + val.lower()).replace(' ', '_')
+            statements.append(f'SUM(CASE WHEN {col} = "{val}" THEN QT_ELEITORES_PERFIL ELSE 0 END) AS {col_alias}')
+        
+        return ','.join(statements)   
+            
+    def generate_stats_query(self, alias, table, cols) -> str:
+        counts = [self._count_cases(alias, table, col) for col in cols]
+        str_counts = ','.join(counts)
+        query = f"""
+            SELECT
+                CD_MUNICIPIO as municipio,
+                NR_LOCAL_VOTACAO as local,
+                NR_ZONA as zona,
+                NR_SECAO as secao,
+                {str_counts}
+            FROM
+                {alias}.{table}
+            GROUP BY
+                CD_MUNICIPIO, NR_LOCAL_VOTACAO, NR_ZONA, NR_SECAO
+        """
+        return query
