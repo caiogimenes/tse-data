@@ -22,6 +22,9 @@ class Config:
         
         # Carregando configurações
         self.config = self.load_config(config_path)
+        for _, dir in self.config['paths'].items():
+            if not os.path.exists(dir):
+                os.makedirs(dir)
     
     def load_config(self, file_path):
         with open(file_path, 'r') as file:

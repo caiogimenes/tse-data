@@ -6,13 +6,6 @@ api:
   tag_list: "action/tag_list"
   group_show: "action/group_show"
 
-database:
-  host: "localhost"
-  port: 5432
-  user: "usuario"
-  password: "senha"
-  dbname: "nome_do_banco"
-
 paths:
   raw_data: "../data/raw"
   processed_data: "../data/processed"
