@@ -17,3 +17,4 @@ paths:
   raw_data: "../data/raw"
   processed_data: "../data/processed"
   sql_data: "../data/databases"
+  maps: "../mapas"
