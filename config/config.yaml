@@ -1,0 +1,19 @@
+api:
+  base_url: "https://dadosabertos.tse.jus.br/api/3/"
+  package_list: "action/package_list"
+  group_list: "action/group_list"
+  package_show: "action/package_show"
+  tag_list: "action/tag_list"
+  group_show: "action/group_show"
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "usuario"
+  password: "senha"
+  dbname: "nome_do_banco"
+
+paths:
+  raw_data: "../data/raw"
+  processed_data: "../data/processed"
+  sql_data: "../data/databases"

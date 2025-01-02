@@ -1,2 +1,6 @@
 sqlachemy
 pandas
+pyyaml
+numpy
+folium
+scipy
